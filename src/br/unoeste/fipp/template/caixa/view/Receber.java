@@ -15,7 +15,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class Receber extends Application
@@ -23,22 +22,27 @@ public class Receber extends Application
     private Caixa caixa;
     private Recebimento recebimento;
     
+    private Label lbPesq;
     private TextField txPesq;
+    private Button btBuscar;
+    private Label lbData;
     private TextField txData;
+    private Label lbValor;
     private TextField txValor;
+    private Label lbDesc;
     private TextField txDesc;
     private Button btConfirmar;
+    private Button btVoltar;
+    private AnchorPane root;
+    private Scene scene;
     
-    public Receber(Caixa caixa)
-    {
+    public Receber(Caixa caixa) {
         this.caixa = caixa;
     }
     
     @Override
-    public void start(Stage primaryStage)
-    {
-        Label lbPesq = new Label("Conta: ");
-        lbPesq.setFont(Font.font("System", 11));
+    public void start(Stage primaryStage) {
+        lbPesq = new Label("Conta: ");
         lbPesq.setLayoutX(10);
         lbPesq.setLayoutY(12);
         
@@ -46,14 +50,13 @@ public class Receber extends Application
         txPesq.setLayoutX(60);
         txPesq.setLayoutY(8);
         
-        Button btBuscar = new Button("BUSCAR");
+        btBuscar = new Button("BUSCAR");
         btBuscar.setLayoutX(220);
         btBuscar.setLayoutY(8);
         btBuscar.setPrefWidth(70);
         btBuscar.setOnAction((ActionEvent event) -> { obter(txPesq); });
         
-        Label lbData = new Label("Data: ");
-        lbData.setFont(Font.font("System", 11));
+        lbData = new Label("Data: ");
         lbData.setLayoutX(10);
         lbData.setLayoutY(50);
         
@@ -62,8 +65,7 @@ public class Receber extends Application
         txData.setLayoutY(48);
         txData.setDisable(true);
         
-        Label lbValor = new Label("Valor R$:");
-        lbValor.setFont(Font.font("System", 11));
+        lbValor = new Label("Valor R$:");
         lbValor.setLayoutX(10);
         lbValor.setLayoutY(92);
         
@@ -71,8 +73,7 @@ public class Receber extends Application
         txValor.setLayoutX(60);
         txValor.setLayoutY(88);
         
-        Label lbDesc = new Label("Desc.: ");
-        lbDesc.setFont(Font.font("System", 11));
+        lbDesc = new Label("Desc.: ");
         lbDesc.setLayoutX(10);
         lbDesc.setLayoutY(132);
         
@@ -87,13 +88,13 @@ public class Receber extends Application
         btConfirmar.setPrefWidth(280);
         btConfirmar.setOnAction((ActionEvent event) -> { confirmar(); });
         
-        Button btVoltar = new Button("VOLTAR");
+        btVoltar = new Button("VOLTAR");
         btVoltar.setLayoutX(10);
         btVoltar.setLayoutY(220);
         btVoltar.setPrefWidth(280);
         btVoltar.setOnAction((ActionEvent event) -> { voltar(primaryStage); });
         
-        AnchorPane root = new AnchorPane();
+        root = new AnchorPane();
         root.getChildren().add(lbPesq);
         root.getChildren().add(txPesq);
         root.getChildren().add(btBuscar);
@@ -106,7 +107,7 @@ public class Receber extends Application
         root.getChildren().add(btConfirmar);
         root.getChildren().add(btVoltar);
         
-        Scene scene = new Scene(root, 300, 260);
+        scene = new Scene(root, 300, 260);
         
         primaryStage.setTitle("Receber contas");
         primaryStage.setScene(scene);
@@ -132,11 +133,6 @@ public class Receber extends Application
     }
     
     private void voltar(Stage primaryStage) {
-        try {
-            this.finalize();
-        } catch (Throwable ex) {
-            Logger.getLogger(Receber.class.getName()).log(Level.SEVERE, null, ex);
-        }
         new Inicio().start(primaryStage);
     }
     
@@ -146,12 +142,9 @@ public class Receber extends Application
         try {
             mensagem = new ReceberControl(caixa).confirmar(recebimento.getId());
             //String mensagem = "";
-            if (mensagem.length() > 0)
-            {
+            if (mensagem.length() > 0) {
                 new Alert(Alert.AlertType.ERROR, mensagem, ButtonType.CLOSE).show();
-            }
-            else
-            {
+            } else {
                 new Alert(Alert.AlertType.INFORMATION, "Conta recebida!", ButtonType.CLOSE).show();
                 btConfirmar.setDisable(true);
             }

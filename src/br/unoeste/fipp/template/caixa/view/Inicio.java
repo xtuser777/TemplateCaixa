@@ -11,7 +11,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /**
@@ -22,61 +21,99 @@ public class Inicio extends Application
 {
     private Caixa caixa;
     
+    private Label lbStatus;
+    private TextField txStatus;
+    private Label lbSaldoIni;
+    private TextField txSaldoIni;
+    private Label lbSaldoFin;
+    private TextField txSaldoFin;
+    private Button btAbrir;
+    private Button btFechar;
+    private Button btLancar;
+    private Button btQuitar;
+    private Button btReceber;
+    private Button btSair;
+    private AnchorPane root;
+    private Scene scene;
+    
     @Override
     public void start(Stage primaryStage) 
     {
         this.caixa = new InicioControl().obterCaixa(1);
         
-        Label lbStatus = new Label("Estado: ");
-        lbStatus.setFont(Font.font("System", 11));
+        lbStatus = new Label("Estado: ");
         lbStatus.setLayoutX(10);
         lbStatus.setLayoutY(10);
         
-        TextField txStatus = new TextField(caixa.isStatus() ? "ABERTO" : "FECHADO");
+        txStatus = new TextField(caixa.isStatus() ? "ABERTO" : "FECHADO");
         txStatus.setLayoutX(10);
         txStatus.setLayoutY(26);
         txStatus.setPrefWidth(280);
         txStatus.setDisable(true);
         
-        Button btAbrir = new Button("ABRIR");
+        lbSaldoIni = new Label("Saldo Inicial:");
+        lbSaldoIni.setLayoutX(10);
+        lbSaldoIni.setLayoutY(56);
+        
+        txSaldoIni = new TextField(""+caixa.getSaldoInicial());
+        txSaldoIni.setLayoutX(10);
+        txSaldoIni.setLayoutY(72);
+        txSaldoIni.setDisable(true);
+        txSaldoIni.setPrefWidth(135);
+        
+        lbSaldoFin = new Label("Saldo Final:");
+        lbSaldoFin.setLayoutX(155);
+        lbSaldoFin.setLayoutY(56);
+        
+        txSaldoFin = new TextField(""+caixa.getSaldoFinal());
+        txSaldoFin.setLayoutX(155);
+        txSaldoFin.setLayoutY(72);
+        txSaldoFin.setDisable(true);
+        txSaldoFin.setPrefWidth(135);
+        
+        btAbrir = new Button("ABRIR");
         btAbrir.setLayoutX(10);
-        btAbrir.setLayoutY(100);
+        btAbrir.setLayoutY(112);
         btAbrir.setPrefWidth(135);
-        btAbrir.setOnAction((ActionEvent event) -> { abrirAction(txStatus); });
+        btAbrir.setOnAction((ActionEvent event) -> { abrirAction(); });
         
-        Button btFechar = new Button("FECHAR");
-        btFechar.setLayoutX(150);
-        btFechar.setLayoutY(100);
+        btFechar = new Button("FECHAR");
+        btFechar.setLayoutX(155);
+        btFechar.setLayoutY(112);
         btFechar.setPrefWidth(135);
-        btFechar.setOnAction((ActionEvent event) -> { fecharAction(txStatus); });
+        btFechar.setOnAction((ActionEvent event) -> { fecharAction(); });
         
-        Button btLancar = new Button("LANCAR PAGAR / RECEBER");
+        btLancar = new Button("LANCAR PAGAR / RECEBER");
         btLancar.setLayoutX(10);
-        btLancar.setLayoutY(140);
+        btLancar.setLayoutY(152);
         btLancar.setPrefWidth(280);
         btLancar.setOnAction((ActionEvent event) -> { lancarAction(primaryStage); });
         
-        Button btQuitar = new Button("QUITAR");
+        btQuitar = new Button("QUITAR");
         btQuitar.setLayoutX(10);
-        btQuitar.setLayoutY(180);
+        btQuitar.setLayoutY(192);
         btQuitar.setPrefWidth(280);
         btQuitar.setOnAction((ActionEvent event) -> { quitarAction(primaryStage); });
         
-        Button btReceber = new Button("RECEBER");
+        btReceber = new Button("RECEBER");
         btReceber.setLayoutX(10);
-        btReceber.setLayoutY(220);
+        btReceber.setLayoutY(232);
         btReceber.setPrefWidth(280);
         btReceber.setOnAction((ActionEvent event) -> { receberAction(primaryStage); });
         
-        Button btSair = new Button("SAIR");
+        btSair = new Button("SAIR");
         btSair.setLayoutX(10);
-        btSair.setLayoutY(260);
+        btSair.setLayoutY(272);
         btSair.setPrefWidth(280);
         btSair.setOnAction((ActionEvent event) -> { sairAction(); });
         
-        AnchorPane root = new AnchorPane();
+        root = new AnchorPane();
         root.getChildren().add(lbStatus);
         root.getChildren().add(txStatus);
+        root.getChildren().add(lbSaldoIni);
+        root.getChildren().add(txSaldoIni);
+        root.getChildren().add(lbSaldoFin);
+        root.getChildren().add(txSaldoFin);
         root.getChildren().add(btAbrir);
         root.getChildren().add(btFechar);
         root.getChildren().add(btLancar);
@@ -84,14 +121,14 @@ public class Inicio extends Application
         root.getChildren().add(btReceber);
         root.getChildren().add(btSair);
         
-        Scene scene = new Scene(root, 300, 320);
+        scene = new Scene(root, 300, 310);
         
         primaryStage.setTitle("Template Caixa");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
     
-    private void abrirAction(TextField txt)
+    private void abrirAction()
     {
         String retorno = new InicioControl().abreCaixa(caixa);
         
@@ -101,11 +138,11 @@ public class Inicio extends Application
         }
         else
         {
-            txt.setText("ABERTO");
+            txStatus.setText("ABERTO");
         }
     }
     
-    private void fecharAction(TextField txt)
+    private void fecharAction()
     {
         String retorno = new InicioControl().fecharCaixa(caixa);
         
@@ -115,7 +152,7 @@ public class Inicio extends Application
         }
         else
         {
-            txt.setText("FECHADO");
+            txStatus.setText("FECHADO");
         }
     }
     
