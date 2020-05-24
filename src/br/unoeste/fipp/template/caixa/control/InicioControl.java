@@ -7,45 +7,65 @@ import br.unoeste.fipp.template.caixa.util.Banco;
  *
  * @author lucas
  */
-public class InicioControl 
-{
-    public Caixa obterCaixa(int id)
-    {
-        Caixa c = null;
-        c = Caixa.getById(Banco.getInstance().getConnection(), id);
+public class InicioControl {
+    
+    public Caixa obterCaixa(int id) {
+        if (!Banco.getInstance().open()) return null;
+        Caixa c = Caixa.getById(id);
+        Banco.getInstance().close();
         
         return c;
     }
     
-    public String abreCaixa(Caixa c)
-    {
+    public String abreCaixa(Caixa c) {
         if (c == null || c.getId() == 0) return "Erro interno do sistema.";
+        if (!Banco.getInstance().open()) return "Erro ao conectar-se ao banco de dados.";
+        Banco.getInstance().beginTransaction();
+        int res = c.abre();
         
-        int res = c.abre(Banco.getInstance().getConnection());
-        
-        switch (res)
-        {
-            case -10: return "Erro durante a aexecução do comando SQL, contate o suporte.";
-            case -5: return "Erro de parâmetros de sistema.";
-            case -1: return "Erro durante a aexecução do comando SQL, contate o suporte.";
+        switch (res) {
+            case -10: 
+                Banco.getInstance().rollback();
+                Banco.getInstance().close();
+                return "Erro durante a aexecução do comando SQL, contate o suporte.";
+            case -5: 
+                Banco.getInstance().rollback();
+                Banco.getInstance().close();
+                return "Erro de parâmetros de sistema.";
+            case -1: 
+                Banco.getInstance().rollback();
+                Banco.getInstance().close();
+                return "Erro durante a aexecução do comando SQL, contate o suporte.";
             default: 
+                Banco.getInstance().commit();
+                Banco.getInstance().close();
                 c.setStatus(true); 
                 return "";
         }
     }
     
-    public String fecharCaixa(Caixa c)
-    {
+    public String fecharCaixa(Caixa c) {
         if (c == null || c.getId() == 0) return "Erro interno do sistema.";
+        if (!Banco.getInstance().open()) return "Erro ao conectar-se ao banco de dados.";
+        Banco.getInstance().beginTransaction();
+        int res = c.fechar();
         
-        int res = c.fechar(Banco.getInstance().getConnection());
-        
-        switch (res)
-        {
-            case -10: return "Erro durante a aexecução do comando SQL, contate o suporte.";
-            case -5: return "Erro de parâmetros de sistema.";
-            case -1: return "Erro durante a aexecução do comando SQL, contate o suporte.";
+        switch (res) {
+            case -10: 
+                Banco.getInstance().rollback();
+                Banco.getInstance().close();
+                return "Erro durante a aexecução do comando SQL, contate o suporte.";
+            case -5: 
+                Banco.getInstance().rollback();
+                Banco.getInstance().close();
+                return "Erro de parâmetros de sistema.";
+            case -1: 
+                Banco.getInstance().rollback();
+                Banco.getInstance().close();
+                return "Erro durante a aexecução do comando SQL, contate o suporte.";
             default: 
+                Banco.getInstance().commit();
+                Banco.getInstance().close();
                 c.setStatus(false); 
                 return "";
         }

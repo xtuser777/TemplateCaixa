@@ -94,7 +94,7 @@ public class Recebimento {
         return status+": "+this.id+" | Conta: "+this.conta+" | Valor: "+this.valor+" | Venc: "+this.dataVencimento.toString();
     }
 
-    public int gravar(Connection conn) {
+    public int gravar() {
         int result = -10;
         String sql = ""
                 + "insert "
@@ -102,8 +102,8 @@ public class Recebimento {
                 + "values(?,?,?,?,?) "
                 + "returning rec_id;";
 
-        if (conn != null) {
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 ps.setString(1, conta);
                 ps.setDouble(2, valor);
                 ps.setDate(3, Date.valueOf(dataConta));
@@ -114,9 +114,7 @@ public class Recebimento {
                     if (rs.next()) {
                         result = rs.getInt("rec_id");
                     }
-                    rs.close();
                 }
-                ps.close();
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -125,21 +123,19 @@ public class Recebimento {
         return result;
     }
     
-    public int receber(Connection conn) {
+    public int receber() {
         int result = -10;
         String sql = ""
                 + "update recebimento "
                 + "set rec_data_recebimento = ? "
                 + "where rec_id = ?;";
 
-        if (conn != null) {
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 ps.setDate(1, Date.valueOf(LocalDate.now()));
                 ps.setInt(2, id);
 
                 result = ps.executeUpdate();
-
-                ps.close();
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -148,15 +144,15 @@ public class Recebimento {
         return result;
     }
 
-    public int atualizar(Connection conn) {
+    public int atualizar() {
         int result = -10;
         String sql = ""
                 + "update recebimento "
                 + "set rec_conta = ?, rec_valor = ?, rec_data_conta = ?, rec_data_recebimento = ?, rec_data_vencimento = ? "
                 + "where rec_id = ?;";
 
-        if (conn != null) {
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 ps.setString(1, conta);
                 ps.setDouble(2, valor);
                 ps.setDate(3, Date.valueOf(dataConta));
@@ -165,8 +161,6 @@ public class Recebimento {
                 ps.setInt(6, id);
 
                 result = ps.executeUpdate();
-
-                ps.close();
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -175,13 +169,13 @@ public class Recebimento {
         return result;
     }
 
-    public Recebimento ObterPorId(Connection conn, int id) {
+    public Recebimento ObterPorId(int id) {
 
         Recebimento r = null;
         String sql = "select * from recebimento where rec_id = ?;";
 
-        if (conn != null) {
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 ps.setInt(1, id);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -194,9 +188,7 @@ public class Recebimento {
                             rs.getDouble("rec_valor")
                         );
                     }
-                    rs.close();
                 }
-                ps.close();
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -205,14 +197,13 @@ public class Recebimento {
         return r;
     }
 
-    public ArrayList<Recebimento> obterTodos(Connection conn) {
+    public ArrayList<Recebimento> obterTodos() {
 
         ArrayList<Recebimento> recebimentos = null;
         String sql = "select * from recebimento;";
-        Banco db = Banco.getInstance();
 
-        if (conn != null) {
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 try (ResultSet rs = ps.executeQuery()) {
                     recebimentos = new ArrayList<>();
                     while (rs.next()) {
@@ -227,9 +218,7 @@ public class Recebimento {
                             )
                         );
                     }
-                    rs.close();
                 }
-                ps.close();
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }

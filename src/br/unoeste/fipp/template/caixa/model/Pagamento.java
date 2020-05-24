@@ -1,5 +1,6 @@
 package br.unoeste.fipp.template.caixa.model;
 
+import br.unoeste.fipp.template.caixa.util.Banco;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -92,15 +93,15 @@ public class Pagamento {
         return status+": "+this.id+" | Conta: "+this.conta+" | Valor: "+this.valor+" | Venc: "+this.dataVencimento.toString();
     }
 
-    public int gravar(Connection conn) {
+    public int gravar() {
         int result = -10;
         String sql = ""
                 + "insert "
                 + "into pagamento (pag_conta, pag_valor, pag_data_conta, pag_data_quitacao, pag_data_vencimento) "
                 + "values(?,?,?,?,?) returning pag_id;";
 
-        if (conn != null) {
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 ps.setString(1, conta);
                 ps.setDouble(2, valor);
                 ps.setDate(3, Date.valueOf(dataConta));
@@ -111,9 +112,7 @@ public class Pagamento {
                     if (rs.next()) {
                         result = rs.getInt("pag_id");
                     }
-                    rs.close();
                 }
-                ps.close();
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -122,15 +121,15 @@ public class Pagamento {
         return result;
     }
     
-    public int quitar(Connection conn) {
+    public int quitar() {
         int result = -10;
         String sql = ""
                 + "update pagamento "
                 + "set pag_data_quitacao = ? "
                 + "where pag_id = ?;";
 
-        if (conn != null) {
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 ps.setDate(1, Date.valueOf(LocalDate.now()));
                 ps.setInt(2, id);
 
@@ -145,15 +144,15 @@ public class Pagamento {
         return result;
     }
 
-    public int atualizar(Connection conn) {
+    public int atualizar() {
         int result = -10;
         String sql = ""
                 + "update pagamento "
                 + "set pag_conta = ?, pag_valor = ?, pag_data_conta = ?, pag_data_quitacao = ?, pag_data_vencimento = ? "
                 + "where pag_id = ?;";
 
-        if (conn != null) {
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 ps.setString(1, conta);
                 ps.setDouble(2, valor);
                 ps.setDate(3, Date.valueOf(dataConta));
@@ -172,13 +171,13 @@ public class Pagamento {
         return result;
     }
 
-    public Pagamento ObterPorId(Connection conn, int id) {
+    public Pagamento ObterPorId(int id) {
 
         Pagamento r = null;
         String sql = "select * from pagamento where pag_id = ?;";
 
-        if (conn != null) {
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 ps.setInt(1, id);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -191,9 +190,7 @@ public class Pagamento {
                             rs.getDouble("pag_valor")
                         );
                     }
-                    rs.close();
                 }
-                ps.close();
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -202,13 +199,13 @@ public class Pagamento {
         return r;
     }
 
-    public ArrayList<Pagamento> obterTodos(Connection conn) {
+    public ArrayList<Pagamento> obterTodos() {
 
         ArrayList<Pagamento> pagamentos = null;
         String sql = "select * from pagamento;";
 
-        if (conn != null) {
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 try (ResultSet rs = ps.executeQuery()) {
                     pagamentos = new ArrayList<>();
                     while (rs.next()) {
@@ -222,9 +219,7 @@ public class Pagamento {
                             )
                         );
                     }
-                    rs.close();
                 }
-                ps.close();
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }

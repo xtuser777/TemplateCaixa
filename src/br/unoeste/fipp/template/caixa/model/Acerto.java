@@ -1,5 +1,6 @@
 package br.unoeste.fipp.template.caixa.model;
 
+import br.unoeste.fipp.template.caixa.util.Banco;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -51,25 +52,21 @@ public class Acerto
         return motivo;
     }
     
-    public int salvar(Connection conn)
+    public int salvar()
     {
         if (this.id != 0 || this.data == null || this.tipo == 0 || this.valor <= 0 || this.motivo == null || this.motivo.isEmpty()) return -5;
         
         String sql = "insert into acerto(act_data,act_valor,act_tipo,act_motivo) values(?,?,?,?) returning act_id;";
         
-        if (conn != null)
-        {
-            try (PreparedStatement ps = conn.prepareStatement(sql))
-            {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.of(data, LocalTime.now())));
                 ps.setDouble(2, valor);
                 ps.setInt(3, tipo);
                 ps.setString(4, motivo);
 
-                try(ResultSet rs = ps.executeQuery())
-                {
-                    if (rs.next())
-                    {
+                try(ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
                         int result = rs.getInt("act_id");
                         this.id = result;
                         return result;

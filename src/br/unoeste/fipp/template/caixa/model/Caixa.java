@@ -1,11 +1,9 @@
 package br.unoeste.fipp.template.caixa.model;
 
-import java.sql.Connection;
+import br.unoeste.fipp.template.caixa.util.Banco;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Caixa
 {
@@ -47,21 +45,17 @@ public class Caixa
         return saldoFinal;
     }
     
-    public int abre(Connection conn)
+    public int abre()
     {
         if (this.id <= 0) return -5;
         this.status = true;
         String sql = "update caixa set cxa_status = true where cxa_id = ?;";
-        if (conn != null)
-        {
-            try (PreparedStatement ps = conn.prepareStatement(sql))
-            {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 ps.setInt(1, id);
 
                 return ps.executeUpdate();
-            }
-            catch (SQLException ex) 
-            {
+            } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
                 return -10;
             }
@@ -70,21 +64,16 @@ public class Caixa
         return -10;
     }
     
-    public int fechar(Connection conn)
-    {
+    public int fechar() {
         if (this.id <= 0) return -5;
         this.status = false;
         String sql = "update caixa set cxa_status = false where cxa_id = ?;";
-        if (conn != null)
-        {
-            try (PreparedStatement ps = conn.prepareStatement(sql))
-            {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 ps.setInt(1, id);
 
                 return ps.executeUpdate();
-            }
-            catch (SQLException ex) 
-            {
+            } catch (SQLException ex)  {
                 System.out.println(ex.getMessage());
                 return -10;
             }
@@ -93,8 +82,7 @@ public class Caixa
         return -10;
     }
     
-    public int decrementar(Connection conn, Double valor)
-    {
+    public int decrementar(Double valor) {
         if (valor == null || valor < 0 || valor > this.saldoFinal || !status) return -5;
         
         if(valor.intValue() != valor && valor.toString().replace(".","#").split("#")[1].length() > 2) return -4;
@@ -103,8 +91,8 @@ public class Caixa
         this.saldoFinal = this.saldoFinal - valor;
         
         String sql = "update caixa set cxa_saldo_inicial = ?, cxa_saldo_final = ? where cxa_id = ?;";
-        if (conn != null) {
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 ps.setDouble(1, saldoInicial);
                 ps.setDouble(2, saldoFinal);
                 ps.setInt(3, id);
@@ -118,7 +106,7 @@ public class Caixa
         return -10;
     }
     
-    public int incrementar(Connection conn, Double valor)
+    public int incrementar(Double valor)
     {
         if (valor == null || valor < 0 || !status) return -5;
         
@@ -128,8 +116,8 @@ public class Caixa
         this.saldoFinal = this.saldoFinal + valor;
         
         String sql = "update caixa set cxa_saldo_inicial = ?, cxa_saldo_final = ? where cxa_id = ?;";
-        if (conn != null) {
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        if (Banco.getInstance().getConnection() != null) {
+            try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
                 ps.setDouble(1, saldoInicial);
                 ps.setDouble(2, saldoFinal);
                 ps.setInt(3, id);
@@ -143,11 +131,11 @@ public class Caixa
         return -10;
     }
     
-    public static Caixa getById(Connection conn, int id)
+    public static Caixa getById(int id)
     {
-        if (conn == null || id <= 0) return null;
+        if (Banco.getInstance().getConnection() == null || id <= 0) return null;
         String sql = "select * from caixa where cxa_id = ?;";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = Banco.getInstance().getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
             try(ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
